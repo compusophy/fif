@@ -5,6 +5,8 @@ require('dotenv').config();
 import { Button, Frog, TextInput } from 'frog'
 //import { neynar } from 'frog/hubs'
 import { handle } from 'frog/next'
+import axios from 'axios'
+import cheerio from 'cheerio'
 
 const apiKeyNeynar = process.env.NEYNAR_API_KEY || ''; // Provide a default value for apiKeyNeynar
 const signerUUID = process.env.SIGNER_UUID;
@@ -22,7 +24,30 @@ const app = new Frog({
 app.frame('/', async (c) => {
   const { buttonValue, status, verified, frameData, inputText } = c
   
-  let displayMessage = status === 'response' ? inputText : 'FRAME IN FRAME';
+  let dummyURL = "https://make-like.vercel.app/api";
+  let metaTagsMessage = '';
+
+  async function fetchMetaTags() {
+    
+    try {
+      const response = await fetch(dummyURL);
+      const html = await response.text();
+      const $ = cheerio.load(html);
+      const metaTags = $('meta');
+      
+      metaTags.each(function() {
+        metaTagsMessage += '\n' + $.html(this);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  
+    return metaTagsMessage;
+  }
+
+  let displayMessage = status === 'response' ? await fetchMetaTags() : 'FRAME IN FRAME';
+
+
 
   return c.res({
     image: (
@@ -30,30 +55,47 @@ app.frame('/', async (c) => {
         style={{
           alignItems: 'center',
           background: 'black',
-          backgroundSize: '100% 100%',
           display: 'flex',
-          flexDirection: 'column',
-          flexWrap: 'nowrap',
           height: '100%',
           justifyContent: 'center',
           textAlign: 'center',
           width: '100%',
         }}
       >
+        {displayMessage.split('\n').map((line, index) => (
+  <div
+    key={index}
+    style={{
+      color: 'gray',
+      fontSize: 36,
+      fontStyle: 'normal',
+      fontFamily: 'mono',
+      position: 'absolute',
+      top: -36 + index * 36,
+      left: 18,
+    }}
+  >
+    {line}
+  </div>
+))}
+
         <div
           style={{
             color: 'gray',
             fontSize: 36,
             fontStyle: 'normal',
-            fontFamily: 'mono', // The 'mono' font family is used here
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
+            fontFamily: 'mono',
+            position: 'absolute',
+            bottom: 18,
+            
           }}
         >
-          {displayMessage}
+          {dummyURL}
         </div>
+
       </div>
     ),
+    imageAspectRatio: '1.91:1',
     intents: [
       <TextInput placeholder="ENTER FRAME URL..." />,
       <Button value="frameRender">RENDER</Button>,
