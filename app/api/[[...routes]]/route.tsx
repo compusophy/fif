@@ -80,7 +80,8 @@ app.frame('/', async (c) => {
     ),
     intents: [
       // Only show the initial button if status is not 'response'
-      status !== 'response' && <Button value="followButton">make compusophy follow you</Button>,
+      status !== 'response' && <TextInput placeholder="ENTER FRAME URL..." />,
+      status !== 'response' && <Button value="frameRender">RENDER</Button>,
       // Only show the Reset button if status is 'response'
       status === 'response' && <Button.Reset>reset</Button.Reset>,
     ].filter(Boolean),
