@@ -24,13 +24,17 @@ const app = new Frog({
 app.frame('/', async (c) => {
   const { buttonValue, status, verified, frameData, inputText } = c
   
-  let dummyURL = "https://make-like.vercel.app/api";
+  let intialMessage = status === 'response' ? '' : 'FRAME IN FRAME';
+  let inputURL = inputText || 'https://www.w3schools.com/tags/tag_meta.asp';
+  let displayURL = status === 'response' ? inputText : '';
+
+
   let metaTagsMessage = '';
 
   async function fetchMetaTags() {
     
     try {
-      const response = await fetch(dummyURL);
+      const response = await fetch(inputURL);
       const html = await response.text();
       const $ = cheerio.load(html);
       const metaTags = $('meta');
@@ -45,7 +49,10 @@ app.frame('/', async (c) => {
     return metaTagsMessage;
   }
 
-  let displayMessage = status === 'response' ? await fetchMetaTags() : 'FRAME IN FRAME';
+  let displayMessage = '';
+  if (status === 'response') {
+    displayMessage = await fetchMetaTags();
+  }
 
 
 
@@ -81,6 +88,19 @@ app.frame('/', async (c) => {
 
         <div
           style={{
+            color: 'white',
+            fontSize: 36,
+            fontStyle: 'normal',
+            fontFamily: 'mono',
+            
+            
+          }}
+        >
+          {intialMessage}
+        </div>
+        
+        <div
+          style={{
             color: 'gray',
             fontSize: 36,
             fontStyle: 'normal',
@@ -90,15 +110,16 @@ app.frame('/', async (c) => {
             
           }}
         >
-          {dummyURL}
+          {displayURL}
         </div>
 
       </div>
     ),
     imageAspectRatio: '1.91:1',
     intents: [
-      <TextInput placeholder="ENTER FRAME URL..." />,
+      <TextInput placeholder="ENTER A FRAME URL..." />,
       <Button value="frameRender">RENDER</Button>,
+      <Button.Reset>RESET</Button.Reset>,
     ]
   })
 })
