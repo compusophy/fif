@@ -62,19 +62,17 @@ app.frame('/', async (c) => {
       >
         <div
           style={{
-            color: 'white',
-            fontSize: 60,
+            color: 'gray',
+            fontSize: 36,
             fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 30,
+            fontFamily: 'mono', // The 'mono' font family is used here
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}
         >
           {status === 'response'
             ? `success!!`
-            : 'make compusophy follow you'}
+            : 'FRAME IN FRAME'}
         </div>
       </div>
     ),
